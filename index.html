@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Report Card System - Lab 03</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, button {
+            padding: 8px 12px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .report-card {
+            margin-top: 30px;
+            padding: 20px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            display: none;
+        }
+        .subject-marks {
+            margin: 10px 0;
+        }
+        .grade-a { color: #2E8B57; font-weight: bold; }
+        .grade-b { color: #4169E1; font-weight: bold; }
+        .grade-c { color: #FF8C00; font-weight: bold; }
+        .grade-fail { color: #DC143C; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Student Report Card System</h1>
+        <h2>Lab 03 - JavaScript Fundamentals</h2>
+        
+        <form id="studentForm">
+            <div class="form-group">
+                <label for="name">Student Name:</label>
+                <input type="text" id="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="rollNumber">Roll Number:</label>
+                <input type="text" id="rollNumber" required>
+            </div>
+            
+            <h3>Enter Marks (out of 100):</h3>
+            
+            <div class="form-group">
+                <label for="math">Mathematics:</label>
+                <input type="number" id="math" min="0" max="100" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="science">Science:</label>
+                <input type="number" id="science" min="0" max="100" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="english">English:</label>
+                <input type="number" id="english" min="0" max="100" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="computer">Computer Science:</label>
+                <input type="number" id="computer" min="0" max="100" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="social">Social Studies:</label>
+                <input type="number" id="social" min="0" max="100" required>
+            </div>
+            
+            <button type="submit">Generate Report Card</button>
+        </form>
+        
+        <div id="reportCard" class="report-card">
+            <h2>Report Card</h2>
+            <div id="reportContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Variables to store student data
+let studentName = '';
+let rollNumber = '';
+let marksArray = [];
+let studentObject = {};
+
+// Function to calculate average marks
+function calculateAverage(marks) {
+    let sum = 0;
+    for (let i = 0; i < marks.length; i++) {
+        sum += marks[i];
+    }
+    return sum / marks.length;
+}
+
+// Function to assign grade based on average marks
+function assignGrade(average) {
+    if (average >= 90) {
+        return 'A';
+    } else if (average >= 75) {
+        return 'B';
+    } else if (average >= 60) {
+        return 'C';
+    } else {
+        return 'Fail';
+    }
+}
+
+// Function to get grade class for styling
+function getGradeClass(grade) {
+    switch(grade) {
+        case 'A': return 'grade-a';
+        case 'B': return 'grade-b';
+        case 'C': return 'grade-c';
+        case 'Fail': return 'grade-fail';
+        default: return '';
+    }
+}
+
+// Function to display report card
+function displayReportCard(student) {
+    const reportContent = document.getElementById('reportContent');
+    const gradeClass = getGradeClass(student.grade);
+    
+    reportContent.innerHTML = `
+        <p><strong>Name:</strong> ${student.name}</p>
+        <p><strong>Roll Number:</strong> ${student.rollNumber}</p>
+        <p><strong>Average Marks:</strong> ${student.average.toFixed(2)}%</p>
+        <p><strong>Grade:</strong> <span class="${gradeClass}">${student.grade}</span></p>
+        
+        <h3>Subject-wise Marks:</h3>
+        <div class="subject-marks">
+            <p><strong>Mathematics:</strong> ${student.marks[0]}%</p>
+            <p><strong>Science:</strong> ${student.marks[1]}%</p>
+            <p><strong>English:</strong> ${student.marks[2]}%</p>
+            <p><strong>Computer Science:</strong> ${student.marks[3]}%</p>
+            <p><strong>Social Studies:</strong> ${student.marks[4]}%</p>
+        </div>
+    `;
+    
+    document.getElementById('reportCard').style.display = 'block';
+}
+
+// Function to print to console for debugging
+function printToConsole(student) {
+    console.log('=== STUDENT REPORT CARD (Console Output) ===');
+    console.log('Name:', student.name);
+    console.log('Roll Number:', student.rollNumber);
+    console.log('Marks Array:', student.marks);
+    console.log('Average Marks:', student.average.toFixed(2) + '%');
+    console.log('Grade:', student.grade);
+    
+    console.log('--- Subject-wise Marks ---');
+    const subjects = ['Mathematics', 'Science', 'English', 'Computer Science', 'Social Studies'];
+    
+    // Using loop to print each subject's marks
+    for (let i = 0; i < subjects.length; i++) {
+        console.log(`${subjects[i]}: ${student.marks[i]}% - Grade: ${student.grade}`);
+    }
+    console.log('==============================');
+}
+
+// Function to validate marks
+function validateMarks(marks) {
+    for (let mark of marks) {
+        if (mark < 0 || mark > 100) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// Main function to handle form submission
+document.getElementById('studentForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    
+    // Get input values using variables
+    studentName = document.getElementById('name').value;
+    rollNumber = document.getElementById('rollNumber').value;
+    
+    // Store marks in an array
+    marksArray = [
+        parseInt(document.getElementById('math').value),
+        parseInt(document.getElementById('science').value),
+        parseInt(document.getElementById('english').value),
+        parseInt(document.getElementById('computer').value),
+        parseInt(document.getElementById('social').value)
+    ];
+    
+    // Validate marks
+    if (!validateMarks(marksArray)) {
+        alert('Please enter valid marks between 0 and 100 for all subjects.');
+        return;
+    }
+    
+    // Calculate average using function
+    const averageMarks = calculateAverage(marksArray);
+    
+    // Assign grade using if-else conditions
+    const grade = assignGrade(averageMarks);
+    
+    // Create student object
+    studentObject = {
+        name: studentName,
+        rollNumber: rollNumber,
+        marks: marksArray,
+        average: averageMarks,
+        grade: grade
+    };
+    
+    // Display report card in browser
+    displayReportCard(studentObject);
+    
+    // Print to console for debugging
+    printToConsole(studentObject);
+});
+
+// Additional examples demonstrating other JavaScript concepts from the lab
+
+// Example of arrow function (as mentioned in lab)
+const square = (number) => number * number;
+console.log('Square of 5:', square(5)); // Output: 25
+
+// Example of rest operator (as mentioned in lab)
+function calculateSum(operation, ...numbers) {
+    let sum = 0;
+    for (let number of numbers) {
+        sum += number;
+    }
+    console.log(`Operation: ${operation}, Sum: ${sum}`);
+    return sum;
+}
+
+// Test the rest operator function
+calculateSum('Addition', 10, 20, 30, 40); // Output: Operation: Addition, Sum: 100
+    </script>
+</body>
+</html>
